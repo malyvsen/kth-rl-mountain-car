@@ -50,17 +50,24 @@ class Agent:
         )
 
     def select_action(self, state: np.ndarray):
-        return np.random.choice(
-            self.environment.action_space.n, p=self.action_probabilities(state)
-        )
+        if np.random.uniform() < self.random_action_probability:
+            return np.random.choice(self.environment.action_space.n)
+        return self.best_action(state)
 
     def train(
-        self, state: np.ndarray, next_state: np.ndarray, action: int, reward: float
-    ):
-        action_probabilities = self.action_probabilities(state)
-        target = reward + self.hyperparameters.discount * sum(
-            self.action_value(next_state, next_action) * probability
-            for next_action, probability in enumerate(action_probabilities)
+        self,
+        state: np.ndarray,
+        action: int,
+        reward: float,
+        next_state: np.ndarray,
+        next_action,
+        done: bool,
+    ) -> "Agent":
+        target = reward + (
+            0
+            if done
+            else self.hyperparameters.discount
+            * self.action_value(next_state, next_action)
         )
         error = target - self.action_value(state, action)
         return replace(
@@ -78,25 +85,13 @@ class Agent:
             },
         )
 
-    def action_probabilities(self, state: np.ndarray) -> np.ndarray:
-        uniform_probability = (
-            self.random_action_probability / self.environment.action_space.n
-        )
-        result = np.full(
-            shape=self.environment.action_space.n, fill_value=uniform_probability
-        )
-        result[self.best_action(state)] = (
-            1 - self.random_action_probability + uniform_probability
-        )
-        return result
-
     def best_action(self, state: np.ndarray) -> int:
         return max(
             range(self.environment.action_space.n),
             key=lambda action: self.action_value(state, action),
         )
 
-    def action_value(self, state: np.ndarray, action: int):
+    def action_value(self, state: np.ndarray, action: int) -> float:
         return sum(
             function.compute(state) for function in self.weighted_functions[action]
         )
