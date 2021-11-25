@@ -35,7 +35,7 @@ class Agent:
                     (2, 1, 0): -0.25,
                     (0, 0, 1): -1,
                     (2, 0, 1): 1,
-                }[tuple([action] + coefficients)]
+                }[tuple([action] + list(coefficients))]
             except KeyError:
                 return 0
 
