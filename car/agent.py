@@ -17,24 +17,41 @@ class Agent:
     weighted_functions: Dict[int, List[WeightedFunction]]
 
     @classmethod
-    def random(
+    def initial(
         cls,
         environment: gym.Env,
         hyperparameters: Hyperparameters,
-        random_action_probability: float,
-        function_order: int,
+        random_action_probability=0.05,
+        function_order=2,
     ):
+        def pick_weight(action, coefficients):
+            bias = sum(-hyperparameters.discount ** step for step in range(200))
+            try:
+                return {
+                    (0, 0, 0): bias + 0.5,
+                    (1, 0, 0): bias,
+                    (2, 0, 0): bias,
+                    (0, 1, 0): 0.25,
+                    (2, 1, 0): -0.25,
+                    (0, 0, 1): -1,
+                    (2, 0, 1): 1,
+                }[tuple([action] + coefficients)]
+            except KeyError:
+                return 0
+
         return cls(
             environment=environment,
             hyperparameters=hyperparameters,
             random_action_probability=random_action_probability,
             weighted_functions={
                 action: [
-                    WeightedFunction.random(
+                    WeightedFunction(
                         basis_function=BasisFunction(
                             environment=environment, coefficients=np.array(coefficients)
                         ),
+                        weight=pick_weight(action, coefficients),
                         hyperparameters=hyperparameters,
+                        eligibility=0,
                     )
                     for coefficients in itertools.product(
                         *[

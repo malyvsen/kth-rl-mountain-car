@@ -12,15 +12,6 @@ class WeightedFunction:
     weight: float
     eligibility: float
 
-    @classmethod
-    def random(cls, basis_function: BasisFunction, hyperparameters: Hyperparameters):
-        return cls(
-            basis_function=basis_function,
-            hyperparameters=hyperparameters,
-            weight=np.random.uniform(-1, 1),
-            eligibility=0,
-        )
-
     def compute(self, observation: np.ndarray):
         return self.basis_function.compute(observation) * self.weight
 
