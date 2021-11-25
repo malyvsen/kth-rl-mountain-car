@@ -5,6 +5,7 @@ from .agent import Agent
 
 
 def train_episode(environment: gym.Env, agent: Agent, render=False):
+    agent = agent.reset()
     state = environment.reset()
     action = agent.select_action(state)
     episode_reward = 0

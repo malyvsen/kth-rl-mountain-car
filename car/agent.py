@@ -66,6 +66,15 @@ class Agent:
             },
         )
 
+    def reset(self) -> "Agent":
+        return replace(
+            self,
+            weighted_functions={
+                action: [function.reset() for function in functions]
+                for action, functions in self.weighted_functions.items()
+            },
+        )
+
     def select_action(self, state: np.ndarray):
         if np.random.uniform() < self.random_action_probability:
             return np.random.choice(self.environment.action_space.n)

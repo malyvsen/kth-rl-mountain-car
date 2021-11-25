@@ -12,6 +12,14 @@ class WeightedFunction:
     weight: float
     eligibility: float
 
+    def reset(self) -> "WeightedFunction":
+        return type(self)(
+            basis_function=self.basis_function,
+            hyperparameters=self.hyperparameters,
+            weight=self.weight,
+            eligibility=0,
+        )
+
     def compute(self, observation: np.ndarray):
         return self.basis_function.compute(observation) * self.weight
 
