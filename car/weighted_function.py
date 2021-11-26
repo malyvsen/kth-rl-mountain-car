@@ -28,7 +28,7 @@ class WeightedFunction:
             self.eligibility
             * self.hyperparameters.discount
             * self.hyperparameters.forgetting
-            + (self.basis_function.compute(observation) if action_selected else 0)
+            + (self.weight_gradient(observation) if action_selected else 0)
         )
         return type(self)(
             basis_function=self.basis_function,
@@ -42,3 +42,8 @@ class WeightedFunction:
             ),
             eligibility=eligibility,
         )
+
+    def weight_gradient(self, observation: np.ndarray) -> float:
+        norm = np.sum(self.basis_function.coefficients ** 2) ** 0.5
+        return self.basis_function.compute(observation) / max(norm, 1)
+
