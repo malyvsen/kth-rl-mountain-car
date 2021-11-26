@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import numpy as np
 
 from .basis_function import BasisFunction
@@ -47,3 +47,7 @@ class WeightedFunction:
         norm = np.sum(self.basis_function.coefficients ** 2) ** 0.5
         return self.basis_function.compute(observation) / max(norm, 1)
 
+    def update_hyperparameters(
+        self, hyperparameters: Hyperparameters
+    ) -> "WeightedFunction":
+        return replace(self, hyperparameters=hyperparameters)

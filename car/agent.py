@@ -111,6 +111,19 @@ class Agent:
             },
         )
 
+    def update_hyperparameters(self, hyperparameters: Hyperparameters) -> "Agent":
+        return replace(
+            self,
+            hyperparameters=hyperparameters,
+            weighted_functions={
+                action: [
+                    function.update_hyperparameters(hyperparameters)
+                    for function in functions
+                ]
+                for action, functions in self.weighted_functions.items()
+            },
+        )
+
     def best_action(self, state: np.ndarray) -> int:
         return max(
             range(self.environment.action_space.n),
