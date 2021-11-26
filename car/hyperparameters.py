@@ -5,5 +5,5 @@ from dataclasses import dataclass
 class Hyperparameters:
     discount: float  # gamma in assignment text
     forgetting: float  # lambda in assignment text
-    eligibility_range: int
     learning_rate: float
+    max_gradient: float

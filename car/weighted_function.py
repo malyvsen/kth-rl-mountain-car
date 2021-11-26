@@ -24,18 +24,21 @@ class WeightedFunction:
         return self.basis_function.compute(observation) * self.weight
 
     def train(self, error: float, observation: np.ndarray, action_selected: bool):
-        eligibility = np.clip(
+        eligibility = (
             self.eligibility
             * self.hyperparameters.discount
             * self.hyperparameters.forgetting
-            + (self.basis_function.compute(observation) if action_selected else 0),
-            -self.hyperparameters.eligibility_range,
-            self.hyperparameters.eligibility_range,
+            + (self.basis_function.compute(observation) if action_selected else 0)
         )
         return type(self)(
             basis_function=self.basis_function,
             hyperparameters=self.hyperparameters,
             weight=self.weight
-            + self.hyperparameters.learning_rate * error * eligibility,
+            + self.hyperparameters.learning_rate
+            * np.clip(
+                error * eligibility,
+                -self.hyperparameters.max_gradient,
+                self.hyperparameters.max_gradient,
+            ),
             eligibility=eligibility,
         )
